@@ -4,13 +4,23 @@
 #include <fstream>
 
 using namespace std; 
- 
-string FindPlayerName(string names[], bool playerTurn);
-int askMove(bool player1Turn, int chipsInPile, string names[]);
-void getUserNames (string players[]);
+
+
+struct player
+{
+   string name;
+   int numWins;	
+}; 
+
+
+string FindPlayerName(player[], bool playerTurn);
+int askMove(bool player1Turn, int chipsInPile, player[]);
+void getUserNames (player []);
+void addWin(player[], bool);
 
 const float MAX_TURN = .5;
 const int MAX_CHIPS = 100;
+
 /////////////////////////////////////////////////////////
 int main()  
 {  
@@ -22,7 +32,7 @@ int main()
   int chipsTaken = 0; 
 
   char userChoice;
-  string playerNames[2];
+  player Players[2];
   
   //Output file variables 
   ofstream outFile;
@@ -32,7 +42,7 @@ int main()
    srand(time(0));
   
   //ask the players for their names, then store in an array
-   getUserNames(playerNames);
+   getUserNames(Players);
  
   
   //start the game with a random number of chips in the pile
@@ -45,7 +55,7 @@ int main()
     moveCounter = 0;
     while (gameOver == false)
 	{
-     chipsTaken = askMove(player1Turn, chipsInPile, playerNames);
+     chipsTaken = askMove(player1Turn, chipsInPile, Players);
 	 chipsInPile = chipsInPile - chipsTaken;
 	 cout << "There are " << chipsInPile << " left in the pile\n";
 	 player1Turn = !player1Turn;
@@ -53,8 +63,9 @@ int main()
 	 if (chipsInPile == 0)
 	 {
 	 	gameOver = true;
-	    cout << FindPlayerName(playerNames, player1Turn) << ", congratulations you won\n";	
-	    outFile << FindPlayerName(playerNames, player1Turn) << " won in " << moveCounter << " moves";	
+	    cout << FindPlayerName(Players, player1Turn) << ", congratulations you won\n";	
+	    outFile << FindPlayerName(Players, player1Turn) << " won in " << moveCounter << " moves";
+		addWin(Players, player1Turn);	
 	 }
  	}
   	cout << "Do you wish to play again? (Y/N)\n";
@@ -62,37 +73,41 @@ int main()
     userChoice = toupper(userChoice);
     
    }while ( userChoice == 'Y'); 
+   cout << Players[0].name << " had " << Players[0].numWins << " total wins this round " << endl;
+   cout << Players[1].name << " had " << Players[1].numWins << " total wins this round " << endl;
    outFile.close(); 
   return 0; 
 } 
 ////////////////////////////////////////////////////////////////////////////////////
-void getUserNames (string players[])
+void getUserNames (player Players[])
 {
 cout << "Player 1, please enter your name: ";
-  cin >> players[0];
+  cin >> Players[0].name;
   cout << "\nThanks and good luck!" << endl;
   cout << "Player 2, please enter your name \n ";
   cout << "(If you wish to play against the computer, enter AI): ";
-  cin >> players[1];
+  cin >> Players[1].name;
   cout << "\nThanks and good luck! \n";
+  Players[0].numWins = 0;
+  Players[1].numWins = 0;
 }
 ////////////////////////////////////////////////////////////////
 
-string FindPlayerName(string names[], bool playerTurn)
+string FindPlayerName(player Players[], bool playerTurn)
 {
 	if (playerTurn == true)
-		return names[0];
+		return Players[0].name;
 	else
-		return names[1];
+		return Players[1].name;
 }
  ///////////////////////////////////////////////////////////////////////////////////
-int askMove(bool player1Turn, int chipsInPile, string names[])
+int askMove(bool player1Turn, int chipsInPile, player Players[])
 {
 	int chipsTaken;
 	int maxPerTurn = MAX_TURN * chipsInPile;
 	do
      {	
-  		cout << FindPlayerName(names, player1Turn) << " How many chips would  you like?\n";
+  		cout << FindPlayerName(Players, player1Turn) << " How many chips would  you like?\n";
 		
     	cout << "You can take up to ";
 		if (( maxPerTurn ) == 0)
@@ -103,7 +118,7 @@ int askMove(bool player1Turn, int chipsInPile, string names[])
 		{
 			cout << maxPerTurn << endl;
 		}
-		if (FindPlayerName(names, player1Turn) == "AI")
+		if (FindPlayerName(Players, player1Turn) == "AI")
          {
           		if (maxPerTurn == 0)
           		{ 
@@ -121,4 +136,15 @@ int askMove(bool player1Turn, int chipsInPile, string names[])
      } while ((chipsTaken > maxPerTurn )  && (chipsInPile > 1));
      return chipsTaken;
 }
-
+///////////////////////////////////////////////////////////
+void addWin(player Players[], bool player1Turn)
+{
+	if (player1Turn)
+	{
+		Players[0].numWins++;
+	}
+	else
+	{
+		Players[1].numWins++;
+	}
+}
