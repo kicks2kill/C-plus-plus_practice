@@ -2,8 +2,7 @@
 #include <cmath>
 #include <float.h>
 
-class BST {
-    public:
+struct BST {
     int value;
     BST *left;
     BST *right;
@@ -33,5 +32,5 @@ int findClosestValueInBSTHelper(BST *tree, int target, int closest) {
             break;
         }
     }
-        return(int) closest;
+        return (int)closest;
 }
